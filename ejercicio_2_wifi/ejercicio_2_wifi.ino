@@ -2,8 +2,8 @@
 #include "DHT.h"
 #define DHTTYPE DHT11   // DHT 11
 
-const char* ssid = "INVERCIONES.GILALF";
-const char* password = "Rafa0524";
+const char* ssid = "Ronaldud iPhone";
+const char* password = "R0naldud2";
 
 #define LED D1 // LED
 // DHT Sensor
