@@ -12,25 +12,25 @@ DHT dht(dht_dpin, DHTTYPE);
 
 //Conexión a Wifi
 //Nombre de la red Wifi
-const char ssid[] = "wifi-name";
+const char ssid[] = "Ronaldud iPhone";
 //Contraseña de la red Wifi
-const char pass[] = "wifi-password";
+const char pass[] = "R0naldud2";
 
 //Usuario uniandes sin @uniandes.edu.co
-#define HOSTNAME "nodeMCU-hostname"
+#define HOSTNAME "r.lugoq"
 
 //Conexión a Mosquitto
 const char MQTT_HOST[] = "iotlab.virtual.uniandes.edu.co";
 const int MQTT_PORT = 8082;
 //Usuario uniandes sin @uniandes.edu.co
-const char MQTT_USER[] = "mosquitto-user";
+const char MQTT_USER[] = "r.lugoq";
 //Contraseña de MQTT que recibió por correo
-const char MQTT_PASS[] = "mosquitto-password";
+const char MQTT_PASS[] = "202216899";
 const char MQTT_SUB_TOPIC[] = HOSTNAME "/";
 //Tópico al que se enviarán los datos de humedad
-const char MQTT_PUB_TOPIC1[] = "humedad/ciudad/" HOSTNAME;
+const char MQTT_PUB_TOPIC1[] = "humedad/bogota/" HOSTNAME;
 //Tópico al que se enviarán los datos de temperatura
-const char MQTT_PUB_TOPIC2[] = "temperatura/ciudad/" HOSTNAME;
+const char MQTT_PUB_TOPIC2[] = "temperatura/bogota/" HOSTNAME;
 
 //////////////////////////////////////////////////////
 
