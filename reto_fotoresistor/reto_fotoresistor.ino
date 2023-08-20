@@ -8,29 +8,38 @@
 #define dht_dpin 4
 DHT dht(dht_dpin, DHTTYPE);
 
+//Pin de conexión análogo - lectura de luminosidad
+const int ANALOG_READ_PIN = A0; 
+//Voltaje del NodeMCU
+#define VIN 3.3 
+// valor de la resistencia (ohm)
+#define R 10000 
+
 #include "secrets.h"
 
 //Conexión a Wifi
 //Nombre de la red Wifi
-const char ssid[] = "wifi-name";
+const char ssid[] = "Ronaldud iPhone";
 //Contraseña de la red Wifi
-const char pass[] = "wifi-password";
+const char pass[] = "R0naldud2";
 
 //Usuario uniandes sin @uniandes.edu.co
-#define HOSTNAME "nodeMCU-hostname"
+#define HOSTNAME "r.lugoq"
 
 //Conexión a Mosquitto
 const char MQTT_HOST[] = "iotlab.virtual.uniandes.edu.co";
 const int MQTT_PORT = 8082;
 //Usuario uniandes sin @uniandes.edu.co
-const char MQTT_USER[] = "mosquitto-user";
+const char MQTT_USER[] = "r.lugoq";
 //Contraseña de MQTT que recibió por correo
-const char MQTT_PASS[] = "mosquitto-password";
+const char MQTT_PASS[] = "202216899";
 const char MQTT_SUB_TOPIC[] = HOSTNAME "/";
 //Tópico al que se enviarán los datos de humedad
-const char MQTT_PUB_TOPIC1[] = "humedad/ciudad/" HOSTNAME;
+const char MQTT_PUB_TOPIC1[] = "humedad/bogota/" HOSTNAME;
 //Tópico al que se enviarán los datos de temperatura
-const char MQTT_PUB_TOPIC2[] = "temperatura/ciudad/" HOSTNAME;
+const char MQTT_PUB_TOPIC2[] = "temperatura/bogota/" HOSTNAME;
+//Tópico al que se enviarán los datos de luminosidad
+const char MQTT_PUB_TOPIC3[] = "luminosidad/bogota/" HOSTNAME;
 
 //////////////////////////////////////////////////////
 
@@ -174,6 +183,10 @@ void loop()
   //Lee los datos del sensor
   float h = dht.readHumidity();
   float t = dht.readTemperature();
+  //Valores de 0-1024
+  int sensorVal = analogRead(ANALOG_READ_PIN);
+  int lux=sensorRawToPhys(sensorVal);
+  
   //Transforma la información a la notación JSON para poder enviar los datos 
   //El mensaje que se envía es de la forma {"value": x}, donde x es el valor de temperatura o humedad
   
@@ -185,6 +198,10 @@ void loop()
   json = "{\"value\": "+ String(t) + "}";
   char payload2[json.length()+1];
   json.toCharArray(payload2,json.length()+1);
+  //JSON para luminosidad
+  json = "{\"value\": "+ String(lux) + "}";
+  char payload3[json.length()+1];
+  json.toCharArray(payload3,json.length()+1);
 
   //Si los valores recolectados no son indefinidos, se envían a los tópicos correspondientes
   if ( !isnan(h) && !isnan(t) ) {
@@ -192,6 +209,8 @@ void loop()
     client.publish(MQTT_PUB_TOPIC1, payload1, false);
     //Publica en el tópico de la temperatura
     client.publish(MQTT_PUB_TOPIC2, payload2, false);
+    //Publica en el tópico de la luminosidad
+    client.publish(MQTT_PUB_TOPIC3, payload3, false);    
   }
 
   //Imprime en el monitor serial la información recolectada
@@ -201,6 +220,23 @@ void loop()
   Serial.print(MQTT_PUB_TOPIC2);
   Serial.print(" -> ");
   Serial.println(payload2);
+  Serial.print(MQTT_PUB_TOPIC3);
+  Serial.print(" -> ");
+  Serial.println(payload3);
+  Serial.print(" fototransistor -> ");
+  Serial.print(sensorVal);
+  Serial.print(" v");
+  Serial.print(" -> ");
+  Serial.print(lux); 
+  Serial.println(" lumen");
   /*Espera 5 segundos antes de volver a ejecutar la función loop*/
   delay(5000);
+}
+
+int sensorRawToPhys(int raw){
+  // Conversion rule
+  float Vout = float(raw) * (VIN / float(1023));// Conversion analog to voltage
+  float RLDR = abs((R * (VIN - Vout))/Vout); // Conversion voltage to resistance
+  int phys=500/(RLDR/1000); // Conversion resitance to lumen
+  return phys;
 }
