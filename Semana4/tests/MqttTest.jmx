@@ -43,19 +43,19 @@
             <stringProp name="Argument.metadata">=</stringProp>
             <stringProp name="Argument.desc">pais/departamento/ciudad</stringProp>
           </elementProp>
-          <elementProp name="user1_user" elementType="Argument">
-            <stringProp name="Argument.name">user1_user</stringProp>
+          <elementProp name="jmeter_user" elementType="Argument">
+            <stringProp name="Argument.name">jmeter_user</stringProp>
             <stringProp name="Argument.value">jmeteruser</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="user1_pass" elementType="Argument">
-            <stringProp name="Argument.name">user1_pass</stringProp>
+          <elementProp name="jmeter_pass" elementType="Argument">
+            <stringProp name="Argument.name">jmeter_pass</stringProp>
             <stringProp name="Argument.value">147852</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="test_threads" elementType="Argument">
             <stringProp name="Argument.name">test_threads</stringProp>
-            <stringProp name="Argument.value">2</stringProp>
+            <stringProp name="Argument.value">1000</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -78,7 +78,7 @@
       <hashTree>
         <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Publish" enabled="true">
           <boolProp name="TransactionController.includeTimers">false</boolProp>
-          <boolProp name="TransactionController.parent">true</boolProp>
+          <boolProp name="TransactionController.parent">false</boolProp>
         </TransactionController>
         <hashTree>
           <net.xmeter.samplers.ConnectSampler guiclass="net.xmeter.gui.ConnectSamplerUI" testclass="net.xmeter.samplers.ConnectSampler" testname="MQTT Connect" enabled="true">
@@ -91,8 +91,8 @@
             <boolProp name="mqtt.dual_ssl_authentication">false</boolProp>
             <stringProp name="mqtt.clientcert_file_path"></stringProp>
             <stringProp name="mqtt.clientcert_password"></stringProp>
-            <stringProp name="mqtt.user_name">${user1_user}</stringProp>
-            <stringProp name="mqtt.password">${user1_pass}</stringProp>
+            <stringProp name="mqtt.user_name">${jmeter_user}</stringProp>
+            <stringProp name="mqtt.password">${jmeter_pass}</stringProp>
             <stringProp name="mqtt.client_id_prefix">pub_</stringProp>
             <boolProp name="mqtt.client_id_suffix">true</boolProp>
             <stringProp name="mqtt.conn_keep_alive">${keep_alive}</stringProp>
@@ -106,12 +106,12 @@
           </LoopController>
           <hashTree>
             <net.xmeter.samplers.PubSampler guiclass="net.xmeter.gui.PubSamplerUI" testclass="net.xmeter.samplers.PubSampler" testname="MQTT Publish Message" enabled="true">
-              <stringProp name="mqtt.topic_name">${topic}/${user1_user}</stringProp>
+              <stringProp name="mqtt.topic_name">${topic}/${jmeter_user}</stringProp>
               <stringProp name="mqtt.qos_level">2</stringProp>
               <boolProp name="mqtt.add_timestamp">true</boolProp>
               <stringProp name="mqtt.message_type">String</stringProp>
               <stringProp name="mqtt.message_type_fixed_length">1024</stringProp>
-              <stringProp name="mqtt.message_to_sent"> MQTT test JMeter - ${user1_user} - test ${__intSum(${__jm__Requests__idx},1)}</stringProp>
+              <stringProp name="mqtt.message_to_sent"> MQTT test JMeter - ${jmeter_user} - test ${__intSum(${__jm__Requests__idx},1)}</stringProp>
               <boolProp name="mqtt.retained_message">false</boolProp>
             </net.xmeter.samplers.PubSampler>
             <hashTree>
@@ -152,7 +152,7 @@
       <hashTree>
         <TransactionController guiclass="TransactionControllerGui" testclass="TransactionController" testname="Subscribe" enabled="true">
           <boolProp name="TransactionController.includeTimers">false</boolProp>
-          <boolProp name="TransactionController.parent">true</boolProp>
+          <boolProp name="TransactionController.parent">false</boolProp>
         </TransactionController>
         <hashTree>
           <net.xmeter.samplers.ConnectSampler guiclass="net.xmeter.gui.ConnectSamplerUI" testclass="net.xmeter.samplers.ConnectSampler" testname="MQTT Connect" enabled="true">
@@ -180,7 +180,7 @@
           </LoopController>
           <hashTree>
             <net.xmeter.samplers.SubSampler guiclass="net.xmeter.gui.SubSamplerUI" testclass="net.xmeter.samplers.SubSampler" testname="MQTT Subscribe Message" enabled="true">
-              <stringProp name="mqtt.topic_name">${topic}/${user1_user}</stringProp>
+              <stringProp name="mqtt.topic_name">${topic}/${jmeter_user}</stringProp>
               <stringProp name="mqtt.qos_level">2</stringProp>
               <boolProp name="mqtt.add_timestamp">true</boolProp>
               <boolProp name="mqtt.debug_response">true</boolProp>
@@ -190,7 +190,7 @@
             <hashTree>
               <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Listen Assertion" enabled="true">
                 <collectionProp name="Asserion.test_strings">
-                  <stringProp name="136288933"> MQTT test JMeter - ${user1_user} - test</stringProp>
+                  <stringProp name="1575662106"> MQTT test JMeter - ${jmeter_user} - test</stringProp>
                 </collectionProp>
                 <stringProp name="Assertion.custom_message"></stringProp>
                 <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
