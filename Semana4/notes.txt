@@ -1,0 +1,5 @@
+Comandos adicionales:
+
+aws ec2
+sudo tail -f /var/log/mosquitto/mosquitto.log
+
