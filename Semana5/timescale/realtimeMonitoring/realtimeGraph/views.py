@@ -541,26 +541,38 @@ def get_avg_data(request, **kwargs):
     end_ts = int(end.timestamp() * 1000000)
 
     data_by_station = Data.objects.filter(
+        station_id = station_param, measurement_id = selected_measure.id,  time__gte=start_ts, time__lte=end_ts)
+
+    """
+    data_by_station = Data.objects.filter(
         station_id = station_param, measurement_id = selected_measure.id,  time__gte=start.date(), time__lte=end.date())
+    """
     try:
         location = data_by_station[0].station.location
     except IndexError:
         return JsonResponse(data_result)
-
-
+        
     data_result["city"] = {
         "lat":location.lat,
         "lng":location.lng,
         'description': f'{location.city.name}, {location.state.name}, {location.country.name}'
     }
-
+    
+    min_val = data_by_station.aggregate(
+        Min('min_value'))['min_value__min']
+    max_val = data_by_station.aggregate(
+        Max('max_value'))['max_value__max']
+    avg_val = data_by_station.aggregate(
+        Avg('avg_value'))['avg_value__avg']
+    """
     min_val = data_by_station.aggregate(
         Min('value'))['value__min']
     max_val = data_by_station.aggregate(
         Max('value'))['value__max']
     avg_val = data_by_station.aggregate(
         Avg('value'))['value__avg']
-
+    """
+   
     station_data.append({
         'min': min_val if min_val != None else 0,
         'max': max_val if max_val != None else 0,
