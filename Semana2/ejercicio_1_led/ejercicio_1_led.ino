@@ -1,16 +1,19 @@
 #include "DHT.h"
 #define DHTTYPE DHT11   // DHT 11
 
-#define dht_dpin 4
+//#define dht_dpin 4 // D2
+#define dht_dpin 0 // D3 
 DHT dht(dht_dpin, DHTTYPE);
 
-#define LED D1 // LED
+//#define LED D1 // LED
+#define LED D4 // LED
 int ValueRead=2;
 int myflag=0;
 
 void setup()
 {
- Serial.begin(9600);
+ //Serial.begin(9600);
+ Serial.begin(115200);
  pinMode(LED, OUTPUT);
  digitalWrite(LED, LOW); //LED comienza apagado
 }

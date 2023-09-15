@@ -5,7 +5,8 @@
 #include "DHT.h"
 #define DHTTYPE DHT11 // DHT 11
 
-#define dht_dpin 4
+//#define dht_dpin 4 // pin D2
+#define dht_dpin 0 // pin D3
 DHT dht(dht_dpin, DHTTYPE);
 
 #include "secrets.h"
@@ -83,7 +84,7 @@ void setup()
   Serial.begin(115200);
   Serial.println();
   Serial.println();
-  Serial.print("Attempting to connect to SSID: ");
+  Serial.print("Attempting to connect to SSID : ");
   Serial.print(ssid);
   WiFi.hostname(HOSTNAME);
   WiFi.mode(WIFI_STA);
