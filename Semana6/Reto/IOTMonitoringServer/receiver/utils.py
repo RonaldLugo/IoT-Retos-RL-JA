@@ -4,6 +4,7 @@ from typing import Tuple
 from django.contrib.auth.models import User
 import requests
 from receiver.models import Location, Station, Measurement, Data, City, State, Country
+from statistics import median
 
 UNITS = {
     "temperatura": "°C",
@@ -145,6 +146,7 @@ def create_data(
     data.max_value = max(values) if length > 0 else 0
     data.min_value = min(values) if length > 0 else 0
     data.avg_value = sum(values) / length if length > 0 else 0
+    data.median_value = median(values) if length > 0 else 0
     data.length = length
 
     data.values = values

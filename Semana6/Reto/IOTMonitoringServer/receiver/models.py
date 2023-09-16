@@ -128,6 +128,7 @@ class Data(models.Model):
     max_value = models.FloatField(null=True, blank=True, default=None)
     length = models.IntegerField(default=0)
     avg_value = models.FloatField(null=True, blank=True, default=None)
+    median_value = models.FloatField(null=True, blank=True, default=None)
     times = ArrayField(models.FloatField(), default=list)
     values = ArrayField(models.FloatField(), default=list)
 
@@ -156,6 +157,7 @@ class Data(models.Model):
             str(self.max_value),
             str(self.length),
             str(self.avg_value),
+            str(self.median_value),
             str(self.times),
             str(self.values),
         )
@@ -170,4 +172,5 @@ class Data(models.Model):
             "min_value": self.min_value,
             "max_value": self.max_value,
             "avg_value": self.avg_value,
+            "median_value": self.median_value,
         }
