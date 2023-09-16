@@ -19,10 +19,19 @@
 #define DHTPIN 0 // pin D3
 // Tipo de sensor de temperatura y humedad
 #define DHTTYPE DHT11
+// Pin del led
+#define LED D4 // LED
+int ledflag=0;
 // Intervalo en segundo de las mediciones
 #define MEASURE_INTERVAL 2
 // Duración aproximada en la pantalla de las alertas que se reciban
 #define ALERT_DURATION 60
+//Pin de conexión análogo - lectura de luminosidad
+const int ANALOG_READ_PIN = A0; 
+//Voltaje del NodeMCU
+#define VIN 3.3 
+// valor de la resistencia (ohm)
+#define R 10000 
 
 // Declaraciones
 
@@ -46,7 +55,7 @@ const char pass[] = "R0naldud2"; // TODO cambiar por la contraseña de la red Wi
 
 //Conexión a Mosquitto
 #define USER "r.lugoq" // TODO Reemplace UsuarioMQTT por un usuario (no administrador) que haya creado en la configuración del bróker de MQTT.
-const char MQTT_HOST[] = "44.212.57.57"; // TODO Reemplace ip.maquina.mqtt por la IP del bróker MQTT que usted desplegó. Ej: 192.168.0.1
+const char MQTT_HOST[] = "54.165.3.240"; // TODO Reemplace ip.maquina.mqtt por la IP del bróker MQTT que usted desplegó. Ej: 192.168.0.1
 const int MQTT_PORT = 8082;
 const char MQTT_USER[] = USER;
 //Contraseña de MQTT
@@ -72,6 +81,8 @@ String alert = "";
 float temp;
 // Valor de la medición de la humedad
 float humi;
+// Valor de la medición de la luminosidad
+int lux;
 
 /**
  * Conecta el dispositivo con el bróker MQTT usando
@@ -111,10 +122,12 @@ void mqtt_connect()
 /**
  * Publica la temperatura y humedad dadas al tópico configurado usando el cliente MQTT.
  */
-void sendSensorData(float temperatura, float humedad) {
+void sendSensorData(float temperatura, float humedad, int lux) {
   String data = "{";
   data += "\"temperatura\": "+ String(temperatura, 1) +", ";
-  data += "\"humedad\": "+ String(humedad, 1);
+  //data += "\"humedad\": "+ String(humedad, 1);
+  data += "\"humedad\": "+ String(humedad, 1) +", ";
+  data += "\"luminosidad\": "+ String(lux, DEC);
   data += "}";
   char payload[data.length()+1];
   data.toCharArray(payload,data.length()+1);
@@ -133,7 +146,7 @@ float readTemperatura() {
   
   Serial.print("Temperatura: ");
   Serial.print(t);
-  Serial.print(" *C ");
+  Serial.print(" *C\t");
   //Serial.println(" *C ");
   
   return t;
@@ -155,12 +168,38 @@ float readHumedad() {
 }
 
 /**
+ * Lee la humedad del sensor DHT, la imprime en consola y la devuelve.
+ */
+float readLuminosidad() {
+  //Valores de 0-1024
+  int sensorVal = analogRead(ANALOG_READ_PIN);
+  int l=sensorRawToPhys(sensorVal);
+  
+  Serial.print("Luminosidad: ");
+  Serial.print(l);
+  Serial.print(" lux ");
+  Serial.print("[");
+  Serial.print(sensorVal);
+  Serial.print("]\t");
+
+  return l;
+}
+
+int sensorRawToPhys(int raw){
+  // Conversion rule
+  float Vout = float(raw) * (VIN / float(1023));// Conversion analog to voltage
+  float RLDR = abs((R * (VIN - Vout))/Vout); // Conversion voltage to resistance
+  int phys=500/(RLDR/1000); // Conversion resitance to lumen
+  return phys;
+}
+
+/**
  * Verifica si las variables ingresadas son números válidos.
  * Si no son números válidos, se imprime un mensaje en consola.
  */
-bool checkMeasures(float t, float h) {
+bool checkMeasures(float t, float h, int l) {
   // Se comprueba si ha habido algún error en la lectura
-    if (isnan(t) || isnan(h)) {
+    if (isnan(t) || isnan(h) || isnan(l)) {
       Serial.println("Error obteniendo los datos del sensor DHT11");
       return false;
     }
@@ -231,6 +270,12 @@ void displayMessage(String message) {
   if (message.equals("OK")) {
     display.setTextSize(2);
     display.println("  " + message); 
+    // reto
+    if(ledflag == 1) {
+      digitalWrite(LED, LOW);   // Se apaga el LED
+      Serial.println("LED apagado");
+      ledflag = 0;
+    }
   } else {
     display.setTextSize(2);
     display.println("ALERT");
@@ -239,6 +284,12 @@ void displayMessage(String message) {
     display.setTextSize(1);
     message.replace("ALERT ","");
     display.println(message); 
+    // reto
+    if(ledflag == 0) {
+      digitalWrite(LED, HIGH);  // Se prende el LED
+      Serial.println("\nLED encendido");
+      ledflag = 1;
+    }
   }
 }
 
@@ -266,7 +317,7 @@ String checkAlert() {
   
   if (alert.length() != 0) {
     message = alert;
-    if ((millis() - alertTime) >= ALERT_DURATION * 1000 ) {
+    if ((millis() - alertTime) >= (ALERT_DURATION * 1000) ) {
       alert = "";
       alertTime = millis();
      }
@@ -419,11 +470,12 @@ void measure() {
     
     temp = readTemperatura();
     humi = readHumedad();
+    lux = readLuminosidad();
 
     // Se chequea si los valores son correctos
-    if (checkMeasures(temp, humi)) {
+    if (checkMeasures(temp, humi, lux)) {
       // Se envían los datos
-      sendSensorData(temp, humi); 
+      sendSensorData(temp, humi, lux); 
     }
   }
 }
@@ -434,6 +486,10 @@ void measure() {
 
 void setup() {
   Serial.begin(115200);
+
+  pinMode(LED, OUTPUT);
+  Serial.println("apagando el led");
+  digitalWrite(LED, LOW); //LED comienza apagado
 
   listWiFiNetworks();
 
