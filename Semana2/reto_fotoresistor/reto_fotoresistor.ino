@@ -5,7 +5,9 @@
 #include "DHT.h"
 #define DHTTYPE DHT11 // DHT 11
 
-#define dht_dpin 4
+//#define dht_dpin 4 // pin D2
+#define dht_dpin 0 // pin D3
+
 DHT dht(dht_dpin, DHTTYPE);
 
 //Pin de conexión análogo - lectura de luminosidad
